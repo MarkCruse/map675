@@ -18,6 +18,12 @@
             padding: 0;
             background: rgba(0,0,0,.75);
         }
+        .tooltip {  //override the default Leaflet styles for tooltip
+            color: white;
+            background: #295b97;
+            border: 0;
+            font-size: 1.3em;
+        }
     </style>
 </head>
 
@@ -89,8 +95,7 @@
             $.getJSON('data/neighborhoods.json'),
             $.getJSON('data/transit-routes-simplified.json'),
             $.getJSON('data/atlanta-urban.json')
-        ).done(function (cityLimits, neighborhoods, transitRoutes, urbanAreas) {
-            drawMap(cityLimits, neighborhoods, transitRoutes, urbanAreas);
+        ).done(function (cityLimits, neighborhoods, transitRoutes, urbanAreas) {drawMap(cityLimits, neighborhoods, transitRoutes, urbanAreas);
         });
 
         function drawMap(cityLimitsData, neighborhoodsData, transitRoutesData, urbanAreasData) {
@@ -107,6 +112,28 @@
             L.geoJson(neighborhoodsData, {
                  style: neighborhoodOptions
             }).addTo(map);
+            L.geoJson(neighborhoodsData, {
+            style: neighborhoodOptions,
+            onEachFeature: function(feature, layer) {
+                // shortut to variable
+                var tooltip = feature.properties.NAME;
+                // bind the tooltip to the layer
+                layer.bindTooltip(tooltip, {
+                    sticky: true,
+                    className: 'tooltip'
+                });
+                // visual affordance on mouseover
+                layer.on('mouseover', function(e) {
+                    this.setStyle({
+                        fillOpacity: .1
+                    });
+                });
+                // use existing option to reset the styles on mouseout
+                layer.on('mouseout', function(e) {
+                    this.setStyle(neighborhoodOptions);
+                });
+            }
+            }).addTo(map);
             L.geoJson(transitRoutesData, {
                 // style each feature
                 style: function(feature) {
@@ -119,7 +146,14 @@
                             type === 'TRAM' ? tramOptions: otherRoutes;
                 }
             }).addTo(map);
+            map.createPane('labels');
+            map.getPane('labels').style.zIndex = 650;
+            map.getPane('labels').style.pointerEvents = 'none';
 
+            L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}.png', {
+                    attribution: '©OpenStreetMap, ©CartoDB',
+                    pane: 'labels'
+            }).addTo(map);
         }
 
     </script>
