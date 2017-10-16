@@ -1,5 +1,14 @@
 <!doctype html>
+<!--
+Mark Cruse October 15, 2017
+Map 675 Module 01 lesson (week 01)
 
+The code below showcases how to improve the visual experience with a map.
+Attention is given to the visual hierarchy, the order in which features are drawn to the map.
+Subtle variations of fill and stroke color and opacity establish the ground (in this case the urban extent,
+city boundaries, and neighboords). More strongly contrasting stroke color(s) are used for the transportation routes,
+which rise to figure on the map and are likely the first point of engagement with a user.
+-->
 <html lang="en">
 
 <head>
@@ -46,25 +55,35 @@
                 [33.620, -84.772]
             ]
         };
-
+        // create Leaflet map and apply options
         var map = L.map('map', options);
+
+        // add labels & tiles to the map
+        map.createPane('labels');
+        map.getPane('labels').style.zIndex = 650;
+        map.getPane('labels').style.pointerEvents = 'none';
+
+        L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}.png', {
+                attribution: '©OpenStreetMap, ©CartoDB',
+                pane: 'labels'
+        }).addTo(map);
 
         // **** Options for various layers - city limits, neighborhoods, subway, bus, tram
         var urbanOptions = {
-            color: '#295b97',
+            color: '#295b97',       //blue
             weight: 0
         }
         var cityLimitsOptions = {
             fillOpacity: 0,
-            color: '#040d18',
+            color: '#040d18',       //b;ack
             opacity: 1,
             weight: 3
         };
 
         var neighborhoodOptions = {
             fillOpacity: .3,
-            fillColor: '#e0ecf9',
-            color: '#151f2b',
+            fillColor: '#e0ecf9',   //light blue
+            color: '#151f2b',       //bluish black
             weight: 1.7,
             opacity: 1
         };
@@ -92,20 +111,28 @@
             weight: 4,
             opacity: 1
         }
-
+        // AJAX calls to load data
         $.when(
             $.getJSON('data/city-limits.json'),
             $.getJSON('data/neighborhoods.json'),
             $.getJSON('data/transit-routes-simplified.json'),
             $.getJSON('data/atlanta-urban.json')
-        ).done(function (cityLimits, neighborhoods, transitRoutes, urbanAreas) {drawMap(cityLimits, neighborhoods, transitRoutes, urbanAreas);
-        });
+        ).done
+        (function (cityLimits, neighborhoods, transitRoutes, urbanAreas) {
+            drawMap(cityLimits, neighborhoods, transitRoutes, urbanAreas);
+            }
+        );
+
+        // ---------------------------------------------------------------
 
         function drawMap(cityLimitsData, neighborhoodsData, transitRoutesData, urbanAreasData) {
+            //next for commented lines were the first phase of loading the data to the map. Colors produced chaos.
             // L.geoJson(cityLimitsData).addTo(map);
             // L.geoJson(neighborhoodsData).addTo(map);
             // L.geoJson(transitRoutesData).addTo(map);
             // L.geoJson(urbanAreasData).addTo(map);
+
+            //load the data to the map rendering the color and styles for each in the particular order below
             L.geoJson(urbanAreasData, {
                 style: urbanOptions
             }).addTo(map);
@@ -117,6 +144,8 @@
             }).addTo(map);
             L.geoJson(neighborhoodsData, {
             style: neighborhoodOptions,
+
+            // add the listener, when any single neighborhood is moused over.
             onEachFeature: function(feature, layer) {
                 // shortut to variable
                 var tooltip = feature.properties.NAME;
@@ -137,6 +166,8 @@
                 });
             }
             }).addTo(map);
+
+            //display transit routes and the corresponding color
             L.geoJson(transitRoutesData, {
                 // style each feature
                 style: function(feature) {
@@ -149,14 +180,7 @@
                             type === 'TRAM' ? tramOptions: otherRoutes;
                 }
             }).addTo(map);
-            map.createPane('labels');
-            map.getPane('labels').style.zIndex = 650;
-            map.getPane('labels').style.pointerEvents = 'none';
 
-            L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}.png', {
-                    attribution: '©OpenStreetMap, ©CartoDB',
-                    pane: 'labels'
-            }).addTo(map);
         }
 
     </script>
