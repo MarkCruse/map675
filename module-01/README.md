@@ -1,11 +1,11 @@
-#Map 675 Module 01 lesson (week 01)
+# Map 675 Module 01 lesson (week 01)
 
 The city of Atlanta wants to build community activities linking their city neighborhoods with the greater metropolitan area. The map depicts using several geographies. Four zipped Shapefiles have been provided.
 
-*Atlanta_City_Limits
-*Neighborhoods
-*Transit_Routes
-*cb_2016_us_ua10_500k
+* Atlanta_City_Limits
+* Neighborhoods
+* Transit_Routes
+* cb_2016_us_ua10_500k
 
 The lesson introduces the use of command-line processes to ease data processing and map development. Concepts introduced
 effectively use the command-line interface (terminal & Git) along with other useful GeoSpatial utility libraries such as GDAL/OGR
